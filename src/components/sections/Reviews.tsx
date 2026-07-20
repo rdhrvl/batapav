@@ -1,10 +1,11 @@
 "use client";
 
 import { BUSINESS_INFO } from '@/lib/business-info';
+import { Review } from '@/lib/types';
 import { Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-const REVIEWS = [
+const REVIEWS: Review[] = [
   {
     name: 'Andi S.',
     text: 'Tempatnya cozy banget buat WFC. Kopinya juara, terutama Batapav Aren. Colokan banyak dan Wi-Fi kencang.',
@@ -32,8 +33,8 @@ const REVIEWS = [
 // review berubah nanti (tidak perlu utak-atik angka duration manual).
 const PIXELS_PER_SECOND = 40;
 
-function ReviewCard({ review }) {
-  const cardRef = useRef(null);
+function ReviewCard({ review }: { review: Review }) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isCenter, setIsCenter] = useState(false);
 
   useEffect(() => {
@@ -88,7 +89,7 @@ function ReviewCard({ review }) {
 }
 
 export default function Reviews() {
-  const trackRef = useRef(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [duration, setDuration] = useState(40);
   const [isPaused, setIsPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -96,25 +97,27 @@ export default function Reviews() {
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduceMotion(mq.matches);
-    const handler = (e) => setReduceMotion(e.matches);
+    const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
 
   useEffect(() => {
-    if (!trackRef.current) return;
+    const trackEl = trackRef.current;
+    if (!trackEl) return;
 
     const computeDuration = () => {
+      if (!trackEl) return;
       // Track berisi 2 set review bersebelahan, jadi lebar satu set
       // adalah setengah dari scrollWidth total track.
-      const oneSetWidth = trackRef.current.scrollWidth / 2;
+      const oneSetWidth = trackEl.scrollWidth / 2;
       setDuration(oneSetWidth / PIXELS_PER_SECOND);
     };
 
     computeDuration();
 
     const resizeObserver = new ResizeObserver(computeDuration);
-    resizeObserver.observe(trackRef.current);
+    resizeObserver.observe(trackEl);
     return () => resizeObserver.disconnect();
   }, []);
 

@@ -15,3 +15,10 @@ export type MenuCategory =
   | 'Snack' 
   | 'Party Menu' 
   | 'Extras';
+
+export interface Review {
+  name: string;
+  text: string;
+  rating: number;
+}
+
